@@ -9,15 +9,15 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-const db = mysql.createConnection(
-    {
-        host: process.env.HOST,
-        user: process.env.USER,
-        password: process.env.PASS,
-        database: 'employeeTracker_db'
-    },
-    console.log(`Connected to the employeeTracker_db database.`)
-);
+// const db = mysql.createConnection(
+//     {
+//         host: process.env.HOST,
+//         user: process.env.USER,
+//         password: process.env.PASS,
+//         database: 'employees'
+//     },
+//     console.log(`Connected to the employees database.`)
+// );
 
 app.listen(PORT, () => {
     console.log(`Listening at http://localhost:${PORT}`);
