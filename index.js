@@ -1,3 +1,5 @@
+// Note: Parts of this code were provided by the course instructor
+
 const { prompt } = require("inquirer");
 const logo = require("asciiart-logo");
 require("console.table");
@@ -31,11 +33,19 @@ function loadMainPrompts() {
         },
         {
           name: "Update an employee's role",
-          value: "UPDATE_EMPLOYEE"
+          value: "UPDATE_EMPLOYEE_ROLE"
+        },
+        {
+          name: "View all departments",
+          value: "VIEW_DEPARTMENTS"
         },
         {
           name: "Add a department",
           value: "ADD_DEPARTMENT"
+        },
+        {
+          name: "View all roles",
+          value: "VIEW_ROLES"
         },
         {
           name: "Add a role",
@@ -60,19 +70,27 @@ function loadMainPrompts() {
       case "ADD_EMPLOYEE":
         addEmployee();
         break;
-      case "UPDATE_EMPLOYEE":
-        updateEmployee();
+      case "UPDATE_EMPLOYEE_ROLE":
+        updateEmployeeRole();
+        break;
+      case "VIEW_DEPARTMENTS":
+        viewDepartments();
         break;
       case "ADD_DEPARTMENT":
         addDepartment();
+        break;
+      case "VIEW_ROLES":
+        viewRoles();
         break;
       case "ADD_ROLE":
         addRole();
         break;
       case "QUIT":
-        break;
+        console.log("Quitting program, have a nice day.");
+        process.exit(0);
       default:
-        console.log(">>>Something else");
+        console.log(">>>Error: Invalid action choice received. Quitting program.");
+        process.exit(0);
     }
   }
 )}
@@ -93,20 +111,96 @@ function viewEmployees() {
     .then(() => loadMainPrompts());
 }
 
-function addEmployee() {
-  console.log(">>>Adding employees");
-}
+async function addEmployee() {
+  await prompt([
+    {
+      type: "input",
+      name: "givenName",
+      message: "What is the employee's given name (limit of 30 characters)?"
+    },
+    {
+      type: "input",
+      name: "familyName",
+      message: "What is the employee's family name (limit of 30 characters)?"
+    },
+    {
+      type: "list",
+      name: "employeeRole",
+      message: "What is the employee's role?",
+      choices: [db.findAllRoleTitles()]
+    },
+    {
+      type: "input",
+      name: "manager",
+      message: "Who is this employee's manager? Leave blank if the employee has no manager"
+    }
+  ])
+  .then((resp) => {
+    console.log(resp);
+  })
 
-function updateEmployee() {
+  loadMainPrompts();
+};
+
+// const addEmployee = async () => {
+//     await prompt([
+//     {
+//       type: "input",
+//       name: "givenName",
+//       message: "What is the employee's given name (limit of 30 characters)?"
+//     },
+//     {
+//       type: "input",
+//       name: "familyName",
+//       message: "What is the employee's family name (limit of 30 characters)?"
+//     },
+//     {
+//       type: "list",
+//       name: "employeeRole",
+//       message: "What is the employee's role?",
+//       choices: db.findAllRoles()
+//     }
+//   ])
+//   .then((resp) => {
+//     console.log(resp);
+//   })
+
+//   loadMainPrompts();
+// };
+
+function updateEmployeeRole() {
   console.log(">>>Updated employees");
+  loadMainPrompts();
+};
+
+function viewDepartments() {
+  db.findAllDepartments()
+    .then(([rows]) => {
+      let departments = rows;
+      console.log("\n");
+      console.table(departments);
+    })
+    .then(() => loadMainPrompts());
 }
 
 function addDepartment() {
   console.log(">>>Added department");
-}
+  loadMainPrompts();
+};
+
+function viewRoles() {
+  db.findAllRoles()
+    .then(([rows]) => {
+      let roles = rows;
+      console.log("\n");
+      console.table(roles);
+    })
+    .then(() => loadMainPrompts());
+};
 
 function addRole() {
   console.log(">>>Added a role");
+  loadMainPrompts();
 }
 
 /* ======= END Controllers ============================================================ */

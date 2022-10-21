@@ -15,13 +15,32 @@ class DB {
   
     findAllEmployees() {
         return this.connection.promise().query(
-        "SELECT * FROM employee;"
+        "SELECT * FROM employees.employee;"
         );
     }
 
-    // Add more class methods below for all the database operations needed.
-    // Sometimes you may need to pass an id value into a method so it knows 
-    //   how to find the correct record.
+    // Helper function that returns all departments
+    findAllDepartments() {
+        return this.connection.promise().query(
+        "SELECT * FROM employees.department;"
+        );
+    }
+
+    // Helper function that returns all roles
+    findAllRoles() {
+        return this.connection.promise().query(
+        `SELECT rl.id, rl.title AS "role title", rl.salary, dep.name AS "department"
+        FROM employees.role rl
+        INNER JOIN employees.department dep ON rl.department_id = dep.id;`
+        );
+    }
+
+    // Helper function that returns all role titles
+    findAllRoleTitles() {
+        return this.connection.promise().query(
+        "SELECT title FROM employees.role;"
+        );
+    }
 
 
 
