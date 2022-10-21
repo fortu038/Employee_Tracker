@@ -9,9 +9,23 @@ const db = require("./db");
 
 // Use this function to display the ascii art logo and to begin the main prompts
 function init() {
+  console.log(
+    logo({
+      name: "Employee Tracker",
+      font: 'Soft',
+      lineChars: 10,
+      padding: 2,
+      margin: 3,
+      borderColor: 'grey',
+      logoColor: 'grey',
+      textColor: 'grey',
+    })
+    .emptyLine()
+    .right('version 1.0.0')
+    .render()
+  );
 
   loadMainPrompts();
-
 }
 
 
@@ -127,7 +141,7 @@ async function addEmployee() {
       type: "list",
       name: "employeeRole",
       message: "What is the employee's role?",
-      choices: [db.findAllRoleTitles()]
+      choices: [db.listAllRoleTitles()]
     },
     {
       type: "input",
@@ -137,9 +151,10 @@ async function addEmployee() {
   ])
   .then((resp) => {
     console.log(resp);
+    db.addEmployee(resp.givenName, resp.familyName, resp.employeeRole, resp.manager);
+    console.log(">>>Added new employee\n");
   })
-
-  loadMainPrompts();
+  .then(() => loadMainPrompts());
 };
 
 // const addEmployee = async () => {
@@ -168,8 +183,16 @@ async function addEmployee() {
 //   loadMainPrompts();
 // };
 
-function updateEmployeeRole() {
-  console.log(">>>Updated employees");
+async function updateEmployeeRole() {
+  // console.log(">>>Updated employees");
+  await prompt([
+    {
+      type: "list",
+      name: "employeeFullName",
+      message: "Which employee's role do you want to change?",
+      choices: [db.listAllEmployeeFullNames]
+    }
+  ])
   loadMainPrompts();
 };
 
@@ -183,9 +206,19 @@ function viewDepartments() {
     .then(() => loadMainPrompts());
 }
 
-function addDepartment() {
-  console.log(">>>Added department");
-  loadMainPrompts();
+async function addDepartment() {
+  // console.log(">>>Added department");
+  await prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "What is the name of the department?"
+    }
+  ])
+  .then((resp) => {
+    db.addDepartment(resp.name);
+  })
+  .then(() => loadMainPrompts());
 };
 
 function viewRoles() {
