@@ -147,6 +147,12 @@ function addEmployee() {
       name: "employeeRole",
       message: "What is the employee's role?",
       choices: db.listAllRoleTitles()
+        // .then((err, results) => {
+        //   let objArray = Object.values(results);
+        //   let holder = [];
+        //   objArray.forEach((elem) => {holder.push(elem.whole_name)});
+        //   return holder;
+        // })
     },
     {
       type: "input",
