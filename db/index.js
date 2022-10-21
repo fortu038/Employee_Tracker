@@ -21,14 +21,27 @@ class DB {
     // Helper function that returns all employees full names, with given name being listed first and
     // family name being listed last.
     listAllEmployeeFullNames() {
-        return this.connection.promise().query(
-        `SELECT CONCAT_WS(" ", first_name, last_name) AS whole_name FROM employees.employee;`
+        this.connection.query(
+        `SELECT CONCAT_WS(" ", first_name, last_name) AS whole_name FROM employees.employee;`,
+        function(err, results) {
+            let objArray = Object.values(results);
+            let holder = [];
+            objArray.forEach((elem) => {holder.push(elem.whole_name)});
+            console.log(`holder in listAllEmployeeFullNames is ${holder}`);
+            return structuredClone(holder); // Once again, JS pointers force me to deep copy
+        }
         );
     }
 
     // Helper function that adds an employee
     addEmployee(givenName, familyName, employeeRole, manager) {
-        this.connection.promise.query(
+        if(manager == "" || manager == " ") {
+            manager = null;
+        }
+        if(employeeRole == undefined) {
+            employeeRole = "Error"
+        }
+        this.connection.query(
         `INSERT INTO emplyees.employee (first_name, last_name, role_id, manager_id)
         VALUES
             (${givenName}, ${familyName}, ${employeeRole}, ${manager})`
@@ -49,7 +62,7 @@ class DB {
 
     // Helper function that adds a department
     addDepartment(name) {
-        this.connection.promise().query(
+        this.connection.query(
         `INSERT INTO employees.department (name)
         VALUES
             (${name})`
@@ -58,15 +71,21 @@ class DB {
 
     // Helepr function that returns all department names
     listAllDepartments() {
-        return this.connection.promise().query(
-        "SELECT name FROM employees.department"
+        this.connection.query(
+        "SELECT name FROM employees.department",
+        function(err, results) {
+            let objArray = Object.values(results);
+            let holder = [];
+            objArray.forEach((elem) => {holder.push(elem.name)});
+            return holder;
+        }
         );
     }
 
     // Helper function that returns all roles
     findAllRoles() {
         return this.connection.promise().query(
-        `SELECT rl.id, rl.title AS "role title", rl.salary, dep.name AS "department"
+        `SELECT rl.id, rl.title AS "role_title", rl.salary, dep.name AS "department"
         FROM employees.role rl
         INNER JOIN employees.department dep ON rl.department_id = dep.id;`
         );
@@ -78,13 +97,17 @@ class DB {
 
     // Helper function that returns all role titles
     listAllRoleTitles() {
-        return this.connection.promise().query(
-        "SELECT title FROM employees.role;"
+        this.connection.query(
+        "SELECT title FROM employees.role;",
+        function(err, results) {
+            let objArray = Object.values(results);
+            let holder = [];
+            objArray.forEach((elem) => {holder.push(elem.title)});
+            console.log(`${holder}`)
+            return holder;
+        }
         );
     }
 }
-
-
-
 
 module.exports = new DB(connection);

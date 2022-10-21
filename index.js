@@ -82,6 +82,10 @@ function loadMainPrompts() {
         viewEmployees();
         break;
       case "ADD_EMPLOYEE":
+        // let holder = db.listAllRoleTitles();
+        // console.log(holder);
+        // db.listAllEmployeeFullNames();
+        // db.listAllRoleTitles();
         addEmployee();
         break;
       case "UPDATE_EMPLOYEE_ROLE":
@@ -125,8 +129,9 @@ function viewEmployees() {
     .then(() => loadMainPrompts());
 }
 
-async function addEmployee() {
-  await prompt([
+function addEmployee() {
+  // console.log(`db.listAllRoleTitles is ${db.listAllRoleTitles()}`);
+  prompt([
     {
       type: "input",
       name: "givenName",
@@ -141,7 +146,7 @@ async function addEmployee() {
       type: "list",
       name: "employeeRole",
       message: "What is the employee's role?",
-      choices: [db.listAllRoleTitles()]
+      choices: db.listAllRoleTitles()
     },
     {
       type: "input",
@@ -150,50 +155,33 @@ async function addEmployee() {
     }
   ])
   .then((resp) => {
+    // db.addEmployee(resp.givenName, resp.familyName, resp.employeeRole, resp.manager);
     console.log(resp);
-    db.addEmployee(resp.givenName, resp.familyName, resp.employeeRole, resp.manager);
-    console.log(">>>Added new employee\n");
   })
   .then(() => loadMainPrompts());
 };
 
-// const addEmployee = async () => {
-//     await prompt([
-//     {
-//       type: "input",
-//       name: "givenName",
-//       message: "What is the employee's given name (limit of 30 characters)?"
-//     },
-//     {
-//       type: "input",
-//       name: "familyName",
-//       message: "What is the employee's family name (limit of 30 characters)?"
-//     },
-//     {
-//       type: "list",
-//       name: "employeeRole",
-//       message: "What is the employee's role?",
-//       choices: db.findAllRoles()
-//     }
-//   ])
-//   .then((resp) => {
-//     console.log(resp);
-//   })
-
-//   loadMainPrompts();
-// };
-
-async function updateEmployeeRole() {
+function updateEmployeeRole() {
   // console.log(">>>Updated employees");
-  await prompt([
+  prompt([
     {
       type: "list",
       name: "employeeFullName",
       message: "Which employee's role do you want to change?",
-      choices: [db.listAllEmployeeFullNames]
+      choices: db.listAllEmployeeFullNames()
+    },
+    {
+      type: "list",
+      name: "newRole",
+      message: "What role do you wish to assign to the employee?",
+      choices: db.listAllRoleTitles()
     }
   ])
-  loadMainPrompts();
+  .then((resp) => {
+    // db.updateEmployeeRole(resp.employeeFullName, )
+    console.log(resp);
+  })
+  .then(() => loadMainPrompts());
 };
 
 function viewDepartments() {
@@ -206,9 +194,9 @@ function viewDepartments() {
     .then(() => loadMainPrompts());
 }
 
-async function addDepartment() {
+function addDepartment() {
   // console.log(">>>Added department");
-  await prompt([
+  prompt([
     {
       type: "input",
       name: "name",
@@ -216,7 +204,8 @@ async function addDepartment() {
     }
   ])
   .then((resp) => {
-    db.addDepartment(resp.name);
+    // db.addDepartment(resp.name);
+    console.log(resp);
   })
   .then(() => loadMainPrompts());
 };
