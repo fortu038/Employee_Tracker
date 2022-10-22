@@ -42,7 +42,7 @@ function loadMainPrompts() {
           value: "VIEW_EMPLOYEES"
         },
         {
-          name: "Add an employees",
+          name: "Add an employee",
           value: "ADD_EMPLOYEE"
         },
         {
@@ -131,63 +131,65 @@ function viewEmployees() {
 
 function addEmployee() {
   // console.log(`db.listAllRoleTitles is ${db.listAllRoleTitles()}`);
-  prompt([
-    {
-      type: "input",
-      name: "givenName",
-      message: "What is the employee's given name (limit of 30 characters)?"
-    },
-    {
-      type: "input",
-      name: "familyName",
-      message: "What is the employee's family name (limit of 30 characters)?"
-    },
-    {
-      type: "list",
-      name: "employeeRole",
-      message: "What is the employee's role?",
-      choices: db.listAllRoleTitles()
-        // .then((err, results) => {
-        //   let objArray = Object.values(results);
-        //   let holder = [];
-        //   objArray.forEach((elem) => {holder.push(elem.whole_name)});
-        //   return holder;
-        // })
-    },
-    {
-      type: "input",
-      name: "manager",
-      message: "Who is this employee's manager? Leave blank if the employee has no manager"
-    }
-  ])
-  .then((resp) => {
-    // db.addEmployee(resp.givenName, resp.familyName, resp.employeeRole, resp.manager);
-    console.log(resp);
-  })
-  .then(() => loadMainPrompts());
+  db.listAllRoleTitles()
+    .then((roles) => {
+      prompt([
+        {
+          type: "input",
+          name: "givenName",
+          message: "What is the employee's given name (limit of 30 characters)?",
+        },
+        {
+          type: "input",
+          name: "familyName",
+          message: "What is the employee's family name (limit of 30 characters)?",
+        },
+        {
+          type: "list",
+          name: "employeeRole",
+          message: "What is the employee's role?",
+          choices: roles,
+        },
+        {
+          type: "input",
+          name: "manager",
+          message: "Who is this employee's manager? Leave blank if the employee has no manager",
+        },
+      ])
+        .then((resp) => {
+          // db.addEmployee(resp.givenName, resp.familyName, resp.employeeRole, resp.manager);
+          console.log(resp);
+        })
+        .then(() => loadMainPrompts());
+    });
 };
 
 function updateEmployeeRole() {
-  // console.log(">>>Updated employees");
-  prompt([
-    {
-      type: "list",
-      name: "employeeFullName",
-      message: "Which employee's role do you want to change?",
-      choices: db.listAllEmployeeFullNames()
-    },
-    {
-      type: "list",
-      name: "newRole",
-      message: "What role do you wish to assign to the employee?",
-      choices: db.listAllRoleTitles()
-    }
-  ])
-  .then((resp) => {
-    // db.updateEmployeeRole(resp.employeeFullName, )
-    console.log(resp);
-  })
-  .then(() => loadMainPrompts());
+  db.listAllRoleTitles()
+    .then ((roles) => {
+      db.listAllEmployeeFullNames()
+        .then ((fullNames) => {
+          prompt([
+            {
+              type: "list",
+              name: "employeeFullName",
+              message: "Which employee's role do you want to change?",
+              choices: fullNames
+            },
+            {
+              type: "list",
+              name: "newRole",
+              message: "What role do you wish to assign to the employee?",
+              choices: roles
+            }
+          ])
+            .then((resp) => {
+              // db.updateEmployeeRole(resp.employeeFullName, resp.newROle)
+              console.log(resp);
+            })
+            .then(() => loadMainPrompts());
+        });
+    });
 };
 
 function viewDepartments() {
@@ -201,7 +203,6 @@ function viewDepartments() {
 }
 
 function addDepartment() {
-  // console.log(">>>Added department");
   prompt([
     {
       type: "input",
@@ -209,11 +210,10 @@ function addDepartment() {
       message: "What is the name of the department?"
     }
   ])
-  .then((resp) => {
-    // db.addDepartment(resp.name);
-    console.log(resp);
-  })
-  .then(() => loadMainPrompts());
+    .then((resp) => {
+      db.addDepartment(resp.name)
+        .then(() => loadMainPrompts());
+    })
 };
 
 function viewRoles() {
@@ -227,9 +227,36 @@ function viewRoles() {
 };
 
 function addRole() {
-  console.log(">>>Added a role");
-  loadMainPrompts();
-}
+  db.listAllDepartments()
+    .then((depArray) => {
+      console.log(`depArray is ${depArray}`);
+      prompt([
+        {
+          type: "input",
+          name: "name",
+          message: "What is the name of the role?"
+        },
+        {
+          type: "input",
+          name: "salary",
+          message: "What is the salary of the role (Please in USD)?"
+        },
+        {
+          type: "input",
+          name: "department",
+          message: "What department is this role in?",
+          choices: depArray
+        }
+      ])
+      .then((resp) => {
+        db.departmentIdFromName(resp.department)
+          .then((id) => {
+            db.addRole(resp.name, resp.salary, id)
+              .then(() => loadMainPrompts());
+          });
+      });
+    });
+};
 
 /* ======= END Controllers ============================================================ */
 

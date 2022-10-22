@@ -46,7 +46,7 @@ class DB {
         this.connection.query(
         `INSERT INTO emplyees.employee (first_name, last_name, role_id, manager_id)
         VALUES
-            (${givenName}, ${familyName}, ${employeeRole}, ${manager})`
+            ("${givenName}", "${familyName}", ${employeeRole}, ${manager})`
         );
     }
 
@@ -64,16 +64,16 @@ class DB {
 
     // Helper function that adds a department
     addDepartment(name) {
-        this.connection.query(
+        return this.connection.promise().query(
         `INSERT INTO employees.department (name)
         VALUES
-            (${name})`
+            ("${name}")`
         );
     }
 
-    // Helepr function that returns all department names
+    // Helper function that returns all department names
     listAllDepartments() {
-        this.connection.query(
+        return this.connection.promise().query(
         "SELECT name FROM employees.department",
         function(err, results) {
             let objArray = Object.values(results);
@@ -81,6 +81,13 @@ class DB {
             objArray.forEach((elem) => {holder.push(elem.name)});
             return holder;
         }
+        );
+    }
+
+    // Helper function that returns a department's id number
+    departmentIdFromName(name) {
+        return this.connection.promise().query(
+        `SELECT id FROM employees.department WHERE name="${name}";`
         );
     }
 
@@ -93,8 +100,13 @@ class DB {
         );
     }
 
-    addRole(title, salary, department) {
-
+    // Helper function that adds a new role
+    addRole(title, salary, department_id) {
+        return this.connection.promise().query(
+        `INSERT INTO employees.role (title, salary, department_id)
+        VALUES
+            ("${title}", ${salary}, ${department_id})`
+        );
     }
 
     // Helper function that returns all role titles
